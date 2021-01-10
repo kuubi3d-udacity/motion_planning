@@ -15,8 +15,10 @@ sys.path.insert(0, "/home/kuubi/ai/Udacity/FCND_Motion_Planning")'''
 from operator import itemgetter
 
 #from rrt import generate_RRT
-
-from planning_utils import a_star, heuristic, create_grid
+#from rrt import create_grid
+from planning_utils import create_grid
+from planning_utils import a_star, heuristic
+# from planning_utils import a_star, heuristic, create_grid
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID

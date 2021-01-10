@@ -77,6 +77,8 @@ class RRT:
     grid[75:90, 80:90] = 1
     grid[30:40, 60:82] = 1
     return grid'''
+
+
 def create_grid(data, drone_altitude, safety_distance):
     """
     Returns a grid representation of a 2D configuration space
@@ -112,11 +114,16 @@ def create_grid(data, drone_altitude, safety_distance):
                 int(np.clip(east + d_east + safety_distance - east_min, 0, east_size-1)),
             ]
             grid[obstacle[0]:obstacle[1]+1, obstacle[2]:obstacle[3]+1] = 1
-
+    
+            print('INFO', grid, drone_altitude, safety_distance)
+            print(grid, int(north_min), int(east_min))
     return grid, int(north_min), int(east_min)
 
 # environment encoded as a grid
-grid = create_grid()
+
+#print(grid, drone_altitude, safety_distance)
+#print(grid, int(north_min), int(east_min))
+grid = create_grid(grid, int(north_min), int(east_min)
 
 # Let's take a look at the example environment we'll be using.
 

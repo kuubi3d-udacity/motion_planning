@@ -15,12 +15,9 @@ sys.path.insert(0, "/home/kuubi/ai/Udacity/FCND_Motion_Planning")'''
 from operator import itemgetter
 
 #from rrt import generate_RRT
-from planning_utils import a_star, heuristic
 from rrt import create_grid
-
-#from planning_utils import create_grid
+from planning_utils import a_star, heuristic
 # from planning_utils import a_star, heuristic, create_grid
-
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -80,7 +77,7 @@ class MotionPlanning(Drone):
                 self.arming_transition()
             elif self.flight_state == States.ARMING:
                 if self.armed:
-                    self.plan_rrt()
+                    self.plan_astar()
             elif self.flight_state == States.PLANNING:
                 self.takeoff_transition()
             elif self.flight_state == States.DISARMING:
@@ -127,7 +124,7 @@ class MotionPlanning(Drone):
         data = msgpack.dumps(self.waypoints)
         self.connection._master.write(data)
 
-    def plan_rrt(self):
+    def plan_astar(self):
         self.flight_state = States.PLANNING
         print("Searching for a path ...")
         TARGET_ALTITUDE = 5
@@ -170,8 +167,8 @@ class MotionPlanning(Drone):
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
-        #path, _ = a_star(grid, heuristic, grid_start, grid_goal)
-        path, _ = generate_RRT(grid, x_int, num_vertices, dt)
+        path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+        
         print ('a_star', 'grid', grid, 'heuristic', heuristic, 'grid_start', grid_start, 'grid_goal', grid_goal)
         print ('a_star path', path, 'py_interpreter', _)
         
@@ -189,9 +186,6 @@ class MotionPlanning(Drone):
         
         # TODO: prune path to minimize number of waypoints
        
-        # TODO (if you're feeling ambitious): Try a different approach altogether!
-         
-               
     def plan_rrt(self):
         pass
 
