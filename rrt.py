@@ -85,6 +85,9 @@ def create_grid(data, drone_altitude, safety_distance):
     based on given obstacle data, drone altitude and safety distance
     arguments.
     """
+    print(data)
+    
+    
     TARGET_ALTITUDE = 5
     SAFETY_DISTANCE = 5
     # minimum and maximum north coordinates
@@ -115,20 +118,22 @@ def create_grid(data, drone_altitude, safety_distance):
             ]
             grid[obstacle[0]:obstacle[1]+1, obstacle[2]:obstacle[3]+1] = 1
     
-            print('INFO', grid, drone_altitude, safety_distance)
-            print(grid, int(north_min), int(east_min))
+    print('INFO', grid, drone_altitude, safety_distance)
+    print(grid, int(north_min), int(east_min))        
+ 
+
+    #print(grid, drone_altitude, safety_distance)
+    #print(grid, int(north_min), int(east_min))
     return grid, int(north_min), int(east_min)
-
+grid = np.zeros((100, 100))
+    
 # environment encoded as a grid
-
-#print(grid, drone_altitude, safety_distance)
-#print(grid, int(north_min), int(east_min))
-grid = create_grid(grid, int(north_min), int(east_min)
+#grid = create_grid(data, drone_altitude, safety_distance)
 
 # Let's take a look at the example environment we'll be using.
 
 plt.imshow(grid, cmap='Greys', origin='upper')
-
+    
 
 # Next you'll implement the functions necessary to generate an RRT. Feel free to change the function signatures however you please, just remember to update `generate_RRT` accordingly.
 
