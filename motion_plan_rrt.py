@@ -163,11 +163,11 @@ class MotionPlanning(Drone):
         # ~ RRT - SZanlongo 
         # ~ PRM
         # environment encoded as a grid
-        grid = create_grid(data, drone_altitude, safety_distance)
+        # ~grid = create_grid()
 
         # Let's take a look at the example environment we'll be using.
 
-        plt.imshow(grid, cmap='Greys', origin='upper')
+        # ~plt.imshow(grid, cmap='Greys', origin='upper')
         # Run A* to find a path from start to goal 
        
         self.local_position_callback
