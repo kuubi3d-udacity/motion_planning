@@ -126,7 +126,27 @@ def create_grid(data, drone_altitude, safety_distance):
 
     
 # environment encoded as a grid
-grid = create_grid(data, drone_altitude, safety_distance)
+
+TARGET_ALTITUDE = 5
+SAFETY_DISTANCE = 5
+
+#self.target_position[2] = TARGET_ALTITUDE
+
+# TODO: read lat0, lon0 from colliders into floating point values
+
+# TODO: set home position to (lon0, lat0, 0)
+
+# TODO: retrieve current global position
+
+# TODO: convert to current local position using global_to_local()
+
+#print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
+                                                                    #self.local_position))
+# Read in obstacle map
+data = np.loadtxt('colliders.csv', delimiter=',', dtype='Float64', skiprows=2)
+
+# Define a grid for a particular altitude and safety margin around obstacles
+grid, north_offset, east_offset = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
 
 # Let's take a look at the example environment we'll be using.
 
