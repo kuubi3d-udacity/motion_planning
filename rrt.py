@@ -181,6 +181,11 @@ def nearest_neighbor(x_rand, rrt):
         if d < closest_dist:
             closest_dist = d
             closest_vertex = v
+    
+        if closest_vertex = goal:
+            print("Found Goal")    
+            break
+    
     return closest_vertex
 
 
@@ -231,13 +236,35 @@ def generate_RRT(grid, x_init, num_vertices, dt):
             # the edge
             rrt.add_edge(x_near, x_new, u)
             
+        # ~ arrive at goal    
+        else:   
+            '''#queue = PriorityQueue()
+            #queue.put((0, start))
+            #visited = set(start)
+
+            #branch = {}
+            found = False
+
+            while not queue.empty():
+                item = queue.get()
+                current_node = item[1]
+                if current_node == start:
+                    current_cost = 0.0
+                else:              
+                    current_cost = branch[current_node][0]'''
+                    
+        if current_node == goal:        
+            print('Found a path.')
+            found = True
+            break
+        #else:    
     return rrt
 
 # Feel free to change any of the values below.
 
-num_vertices = 600
-dt = 1
-x_init = (50, 50)
+num_vertices = 1800
+dt = 18
+x_init = (20, 150)
 
 rrt = generate_RRT(grid, x_init, num_vertices, dt)
 
