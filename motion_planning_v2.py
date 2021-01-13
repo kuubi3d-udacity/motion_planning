@@ -15,9 +15,12 @@ sys.path.insert(0, "/home/kuubi/ai/Udacity/FCND_Motion_Planning")'''
 from operator import itemgetter
 
 #from rrt import generate_RRT
-from rrt import create_grid
 from planning_utils import a_star, heuristic
+from rrt import create_grid, generate_RRT
+
+#from planning_utils import create_grid
 # from planning_utils import a_star, heuristic, create_grid
+
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -77,7 +80,7 @@ class MotionPlanning(Drone):
                 self.arming_transition()
             elif self.flight_state == States.ARMING:
                 if self.armed:
-                    self.plan_astar()
+                    self.plan_rrt()
             elif self.flight_state == States.PLANNING:
                 self.takeoff_transition()
             elif self.flight_state == States.DISARMING:
@@ -124,7 +127,7 @@ class MotionPlanning(Drone):
         data = msgpack.dumps(self.waypoints)
         self.connection._master.write(data)
 
-    def plan_astar(self):
+    def plan_rrt(self):
         self.flight_state = States.PLANNING
         print("Searching for a path ...")
         TARGET_ALTITUDE = 5
@@ -159,7 +162,12 @@ class MotionPlanning(Drone):
     
         # ~ RRT - SZanlongo 
         # ~ PRM
-        
+        # environment encoded as a grid
+        # ~grid = create_grid()
+
+        # Let's take a look at the example environment we'll be using.
+
+        # ~plt.imshow(grid, cmap='Greys', origin='upper')
         # Run A* to find a path from start to goal 
        
         self.local_position_callback
@@ -167,8 +175,14 @@ class MotionPlanning(Drone):
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
-        path, _ = a_star(grid, heuristic, grid_start, grid_goal)
-        
+        #path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+
+        x_goal = (30, 750)
+        num_vertices = 1600
+        dt = 18
+        x_init = (20, 150)
+
+        #path, _ = generate_RRT(grid, x_init, num_vertices, dt)
         print ('a_star', 'grid', grid, 'heuristic', heuristic, 'grid_start', grid_start, 'grid_goal', grid_goal)
         print ('a_star path', path, 'py_interpreter', _)
         
@@ -186,10 +200,13 @@ class MotionPlanning(Drone):
         
         # TODO: prune path to minimize number of waypoints
        
-    def plan_rrt(self):
+        # TODO (if you're feeling ambitious): Try a different approach altogether!
+         
+               
+    '''def plan_rrt(self):
         pass
 
-        '''def path_to_waypoints(self):   
+        def path_to_waypoints(self):   
         self.plan_astar()
         # Convert path to waypoints
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
