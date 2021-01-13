@@ -172,17 +172,22 @@ def sample_state(grid):
 
 
 def nearest_neighbor(x_rand, rrt):
+    
+    #x_goal = (30, 750)
+    
     closest_dist = 100000
     closest_vertex = None
     x_rand = np.array(x_rand)
+
     
     for v in rrt.vertices:
         d = np.linalg.norm(x_rand - np.array(v[:2]))
         if d < closest_dist:
             closest_dist = d
             closest_vertex = v
-    
-        if closest_vertex = goal:
+
+        # ~arrive at goal  
+        if closest_vertex == x_goal:
             print("Found Goal")    
             break
     
@@ -216,7 +221,7 @@ def new_state(x_near, u, dt):
 # Awesome! Now we'll put everything together and generate an RRT.
 
 
-def generate_RRT(grid, x_init, num_vertices, dt):
+def generate_RRT(grid, x_init, num_vertices, dt,):
     
     rrt = RRT(x_init)
     
@@ -237,8 +242,8 @@ def generate_RRT(grid, x_init, num_vertices, dt):
             rrt.add_edge(x_near, x_new, u)
             
         # ~ arrive at goal    
-        else:   
-            '''#queue = PriorityQueue()
+        '''else:   
+            #queue = PriorityQueue()
             #queue.put((0, start))
             #visited = set(start)
 
@@ -253,16 +258,17 @@ def generate_RRT(grid, x_init, num_vertices, dt):
                 else:              
                     current_cost = branch[current_node][0]'''
                     
-        if current_node == goal:        
+        '''if current_node == goal:        
             print('Found a path.')
             found = True
-            break
+            break'''
         #else:    
     return rrt
 
 # Feel free to change any of the values below.
 
-num_vertices = 1800
+x_goal = (30, 750)
+num_vertices = 1600
 dt = 18
 x_init = (20, 150)
 
@@ -273,6 +279,7 @@ rrt = generate_RRT(grid, x_init, num_vertices, dt)
 
 plt.imshow(grid, cmap='Greys', origin='lower')
 plt.plot(x_init[1], x_init[0], 'ro')
+plt.plot(x_goal[1], x_goal[0], 'ro')
 
 for (v1, v2) in rrt.edges:
     plt.plot([v1[1], v2[1]], [v1[0], v2[0]], 'y-')
