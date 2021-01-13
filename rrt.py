@@ -187,7 +187,7 @@ def nearest_neighbor(x_rand, rrt):
             closest_vertex = v
 
         # ~arrive at goal  
-        if closest_vertex == x_goal:
+        if closest_vertex == (30, 750):
             print("Found Goal")    
             break
     

@@ -16,7 +16,7 @@ from operator import itemgetter
 
 #from rrt import generate_RRT
 from planning_utils import a_star, heuristic
-from rrt import create_grid
+from rrt import create_grid, generate_RRT
 
 #from planning_utils import create_grid
 # from planning_utils import a_star, heuristic, create_grid
@@ -176,7 +176,13 @@ class MotionPlanning(Drone):
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
         #path, _ = a_star(grid, heuristic, grid_start, grid_goal)
-        path, _ = generate_RRT(grid, x_int, num_vertices, dt)
+
+        x_goal = (30, 750)
+        num_vertices = 1600
+        dt = 18
+        x_init = (20, 150)
+
+        #path, _ = generate_RRT(grid, x_init, num_vertices, dt)
         print ('a_star', 'grid', grid, 'heuristic', heuristic, 'grid_start', grid_start, 'grid_goal', grid_goal)
         print ('a_star path', path, 'py_interpreter', _)
         
@@ -197,10 +203,10 @@ class MotionPlanning(Drone):
         # TODO (if you're feeling ambitious): Try a different approach altogether!
          
                
-    def plan_rrt(self):
+    '''def plan_rrt(self):
         pass
 
-        '''def path_to_waypoints(self):   
+        def path_to_waypoints(self):   
         self.plan_astar()
         # Convert path to waypoints
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
