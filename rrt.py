@@ -173,8 +173,10 @@ def sample_state(grid):
 
 def nearest_neighbor(x_rand, rrt):
     
-    #x_goal = (30, 750)
-    
+    x_goal = [30,750]
+    wp_radius = np.linalg.norm(x_goal)
+    print (wp_radius)
+
     closest_dist = 100000
     closest_vertex = None
     x_rand = np.array(x_rand)
@@ -185,10 +187,11 @@ def nearest_neighbor(x_rand, rrt):
         if d < closest_dist:
             closest_dist = d
             closest_vertex = v
-
+        print (np.array(v[:2]) 
         # ~arrive at goal  
-        #print (np.array(v[:2]))   
-        if np.array(v[:2]).all == (30, 750):
+        
+        
+        if np.linalg.norm((v[:2] - x_goal)) < 1.0:
             print("Found Goal")    
             break
     
