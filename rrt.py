@@ -173,7 +173,7 @@ def sample_state(grid):
 
 def nearest_neighbor(x_rand, rrt):
     
-    x_goal = (30,750)
+    x_goal = (30, 750)
     print (x_goal) 
     
     wp_radius = np.linalg.norm(x_goal)
@@ -182,7 +182,7 @@ def nearest_neighbor(x_rand, rrt):
     closest_dist = 100000
     closest_vertex = None
     x_rand = np.array(x_rand)
-
+    x_goal = ( 30,750)
     
     for v in rrt.vertices:
         d = np.linalg.norm(x_rand - np.array(v[:2]))
@@ -191,6 +191,9 @@ def nearest_neighbor(x_rand, rrt):
             closest_vertex = v
             
             beans = np.array(v[:2])
+            spinach = np.linalg.norm(x_goal - np.array(v[:2]))
+            
+            print ("matrix_norm", spinach)
             print ("np.array", beans) 
             print ("x_rand", x_rand)
             print ("np.array",)
