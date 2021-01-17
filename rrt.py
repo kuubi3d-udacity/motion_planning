@@ -197,15 +197,16 @@ def nearest_neighbor(x_rand, rrt):
             print ("np.array", beans) 
             print ("x_rand", x_rand)
             print ("np.array",)
+           
             # ~arrive at goal  
             # spinach = np.linalg.norm(v[:2] - x_goal)
             # beans = np.array[np.linalg.norm(v[:2])]
-                #if np.linalg.norm(v[:2] - x_goal) < 1.0:
-            ''' if np.linalg.norm(v[:2] - x_goal) < 1.0:
-                    print("Found Goal")    
-                    break
-            print (np.array(v[:2])''' 
-        return closest_vertex
+        #if np.linalg.norm(v[:2] - x_goal) < 1.0:
+        if np.linalg.norm(beans - x_goal) < 1.0:
+            print("Found Goal")    
+            break
+    'print (np.array(v[:2])'
+    return closest_vertex
 
 
 # ### Selecting Inputs
@@ -255,10 +256,10 @@ def generate_RRT(grid, x_init, num_vertices, dt,):
             # the edge
             rrt.add_edge(x_near, x_new, u)
     return rrt            
-        
+'''       
         
     # ~ arrive at goal    
-'''       
+       
     def found_goal(grid, h, start, goal):    
         path = []
         path_cost = 0
@@ -317,8 +318,7 @@ def heuristic(position, goal_position):
     
     #print('position =', position, 'goal position = ', goal_position)
     #print ('np.linag.norm = ',np.linalg.norm(np.array(position) - np.array(goal_position)))
-    return np.linalg.norm(np.array(position) - np.array(goal_position))
-'''
+    return np.linalg.norm(np.array(position) - np.array(goal_position))'''
 
 # Feel free to change any of the values below.
 
