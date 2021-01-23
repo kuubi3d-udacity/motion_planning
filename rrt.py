@@ -173,24 +173,42 @@ def sample_state(grid):
 
 def nearest_neighbor(x_rand, rrt):
     
-    #x_goal = (30, 750)
+    x_goal = (30, 750)
+    print (x_goal) 
     
+    wp_radius = np.linalg.norm(x_goal)
+    print (wp_radius)
+ 
     closest_dist = 100000
     closest_vertex = None
     x_rand = np.array(x_rand)
+    x_goal = ( 30,750)
+    print ("Generating RRT")
 
-    
     for v in rrt.vertices:
         d = np.linalg.norm(x_rand - np.array(v[:2]))
         if d < closest_dist:
             closest_dist = d
             closest_vertex = v
-
-        # ~arrive at goal  
-        if closest_vertex == (30, 750):
+            
+            beans = np.array(v[:2])
+            spinach = np.linalg.norm(x_goal - np.array(v[:2]))
+            
+            
+            '''
+            print ("matrix_norm", spinach)
+            print ("np.array", beans) 
+            print ("x_rand", x_rand)
+            print ("np.array",)'''
+           
+            # ~arrive at goal  
+            # spinach = np.linalg.norm(v[:2] - x_goal)
+            # beans = np.array[np.linalg.norm(v[:2])]
+        #if np.linalg.norm(v[:2] - x_goal) < 1.0:
+        if np.linalg.norm(beans - x_goal) < 1.0:
             print("Found Goal")    
             break
-    
+    'print (np.array(v[:2])'
     return closest_vertex
 
 
@@ -223,6 +241,7 @@ def new_state(x_near, u, dt):
 
 def generate_RRT(grid, x_init, num_vertices, dt,):
     
+    'print ("Generating RRT...")'
     rrt = RRT(x_init)
     
     for _ in range(num_vertices):
@@ -240,11 +259,13 @@ def generate_RRT(grid, x_init, num_vertices, dt,):
             # the orientation `u` will be added as metadata to
             # the edge
             rrt.add_edge(x_near, x_new, u)
+    
+    print ("RRT Path Mapped")
     return rrt            
-        
+'''       
         
     # ~ arrive at goal    
-        
+       
     def found_goal(grid, h, start, goal):    
         path = []
         path_cost = 0
@@ -303,8 +324,7 @@ def heuristic(position, goal_position):
     
     #print('position =', position, 'goal position = ', goal_position)
     #print ('np.linag.norm = ',np.linalg.norm(np.array(position) - np.array(goal_position)))
-    return np.linalg.norm(np.array(position) - np.array(goal_position))
-
+    return np.linalg.norm(np.array(position) - np.array(goal_position))'''
 
 # Feel free to change any of the values below.
 
