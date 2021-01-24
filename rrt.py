@@ -194,21 +194,20 @@ def nearest_neighbor(x_rand, rrt):
             beans = np.array(v[:2])
             spinach = x_goal - np.array(v[:2])
             
-<<<<<<< HEAD
+
             print ("x_goal", x_goal)
             print ("np.array",beans)
             print ("matrix_norm", spinach)
             print ("np.array", beans) 
             print ("x_rand", x_rand)            
-            
-=======
+        
             
             '''
             print ("matrix_norm", spinach)
             print ("np.array", beans) 
             print ("x_rand", x_rand)
             print ("np.array",)'''
->>>>>>> 9a425b1a87633760cd28a26a5f24d71ab92593e8
+
            
             # ~arrive at goal  
             # spinach = np.linalg.norm(v[:2] - x_goal)
