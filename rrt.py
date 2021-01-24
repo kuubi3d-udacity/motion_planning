@@ -183,7 +183,8 @@ def nearest_neighbor(x_rand, rrt):
     closest_vertex = None
     x_rand = np.array(x_rand)
     x_goal = ( 30,750)
-    
+    print ("Generating RRT")
+
     for v in rrt.vertices:
         d = np.linalg.norm(x_rand - np.array(v[:2]))
         if d < closest_dist:
@@ -193,12 +194,21 @@ def nearest_neighbor(x_rand, rrt):
             beans = np.array(v[:2])
             spinach = x_goal - np.array(v[:2])
             
+<<<<<<< HEAD
             print ("x_goal", x_goal)
             print ("np.array",beans)
             print ("matrix_norm", spinach)
             print ("np.array", beans) 
             print ("x_rand", x_rand)            
             
+=======
+            
+            '''
+            print ("matrix_norm", spinach)
+            print ("np.array", beans) 
+            print ("x_rand", x_rand)
+            print ("np.array",)'''
+>>>>>>> 9a425b1a87633760cd28a26a5f24d71ab92593e8
            
             # ~arrive at goal  
             # spinach = np.linalg.norm(v[:2] - x_goal)
@@ -241,6 +251,7 @@ def new_state(x_near, u, dt):
 
 def generate_RRT(grid, x_init, num_vertices, dt,):
     
+    'print ("Generating RRT...")'
     rrt = RRT(x_init)
     
     for _ in range(num_vertices):
@@ -258,6 +269,8 @@ def generate_RRT(grid, x_init, num_vertices, dt,):
             # the orientation `u` will be added as metadata to
             # the edge
             rrt.add_edge(x_near, x_new, u)
+    
+    print ("RRT Path Mapped")
     return rrt            
 '''       
         
