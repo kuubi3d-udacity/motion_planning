@@ -191,21 +191,24 @@ def nearest_neighbor(x_rand, rrt):
             closest_vertex = v
             
             beans = np.array(v[:2])
-            spinach = np.linalg.norm(x_goal - np.array(v[:2]))
+            spinach = x_goal - np.array(v[:2])
             
+            print ("x_goal", x_goal)
+            print ("np.array",beans)
             print ("matrix_norm", spinach)
             print ("np.array", beans) 
-            print ("x_rand", x_rand)
-            print ("np.array",)
+            print ("x_rand", x_rand)            
+            
            
             # ~arrive at goal  
             # spinach = np.linalg.norm(v[:2] - x_goal)
             # beans = np.array[np.linalg.norm(v[:2])]
         #if np.linalg.norm(v[:2] - x_goal) < 1.0:
-        if np.linalg.norm(beans - x_goal) < 1.0:
+        if np.linalg.norm(spinach) < 1.0:
             print("Found Goal")    
             break
     'print (np.array(v[:2])'
+    print(bool(np.linalg.norm(spinach) < 1.0))
     return closest_vertex
 
 
