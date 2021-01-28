@@ -270,9 +270,9 @@ def generate_RRT(grid, x_init, num_vertices, dt,):
             rrt.add_edge(x_near, x_new, u)
     
     print ("RRT Path Mapped")
-    return rrt            
-'''       
-        
+    return rrt                
+ 
+'''
     # ~ arrive at goal    
        
     def found_goal(grid, h, start, goal):    
@@ -333,7 +333,8 @@ def heuristic(position, goal_position):
     
     #print('position =', position, 'goal position = ', goal_position)
     #print ('np.linag.norm = ',np.linalg.norm(np.array(position) - np.array(goal_position)))
-    return np.linalg.norm(np.array(position) - np.array(goal_position))'''
+    return np.linalg.norm(np.array(position) - np.array(goal_position))
+'''
 
 # Feel free to change any of the values below.
 
