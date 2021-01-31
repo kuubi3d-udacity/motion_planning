@@ -8,21 +8,11 @@ from enum import Enum, auto
 import numpy as np
 import decimal
 
-'''import sys
-sys.path.insert(0, "/home/kuubi/ai/Udacity/FCND_Motion_Planning")'''
 
 # This file is subject to the terms and conditions defined in
 # file 'LICENSE', which is part of this source code package.
 
 from operator import itemgetter
-
-#from rrt import create_grid as grid_gen
-#from planning_utils import a_star, heuristic
-#from rrt import create_grid, rrt_vertices
-#from rrt import create_grid
-
-#from planning_utils import create_grid
-# from planning_utils import a_star, heuristic, create_grid
 
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
@@ -57,7 +47,7 @@ from udacidrone.frame_utils import global_to_local
 # * `new_state`
 # 
 
-import numpy as np 
+
 import matplotlib
 #matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
@@ -66,10 +56,8 @@ import networkx as nx
 from IPython import get_ipython
 import time
 
-from enum import Enum
+#from enum import Enum
 from queue import PriorityQueue
-
-import sys
 
 get_ipython().run_line_magic('matplotlib', 'inline')
 plt.switch_backend('Qt5agg')
@@ -79,14 +67,22 @@ plt.rcParams['figure.figsize'] = 12, 12
 
 
 class RRT:
+
+    x_goal = (30, 750)
+    num_vertices = 1600
+    dt = 18
+    x_init = (20, 150)
+    path = [(20, 30), (40, 50)]
+    
+
     def __init__(self, x_init):
         # A tree is a special case of a graph with
         # directed edges and only one path to any vertex.
         self.tree = nx.DiGraph()
-        self.tree.add_node(self.x_init)
-        self.x_init = x_init(tuple)        
+        self.tree.add_node(x_init)
+                
     def add_vertex(self, x_new):
-        self.tree.add_node(tuple(self.x_init))
+        self.tree.add_node(tuple(RRT.x_init))
     
     def add_edge(self, x_near, x_new, u):
         self.tree.add_edge(tuple(x_near), tuple(x_new), orientation=u)
@@ -171,34 +167,12 @@ class RRT:
             if d < closest_dist:
                 closest_dist = d
                 closest_vertex = v
-                
-                beans = np.array(v[:2])
-                spinach = x_goal - np.array(v[:2])
-                
-                '''
-                print ("x_goal", x_goal)
-                print ("np.array",beans)
-                print ("matrix_norm", spinach)
-                print ("np.array", beans) 
-                print ("x_rand", x_rand)            
-                '''
-                
-                '''
-                print ("matrix_norm", spinach)
-                print ("np.array", beans) 
-                print ("x_rand", x_rand)
-                print ("np.array",)'''
-
-            
-                # ~arrive at goal  
-                # spinach = np.linalg.norm(v[:2] - x_goal)
-                # beans = np.array[np.linalg.norm(v[:2])]
-            #if np.linalg.norm(v[:2] - x_goal) < 1.0:
-            if np.linalg.norm(spinach) < 1.0:
+            '''
+            if np.linalg.norm(x_goal - np.array(v[:2])) < 1.0:
                 print("Found Goal")    
-                break
-        'print (np.array(v[:2])'
-        print(bool(np.linalg.norm(spinach) < 1.0))
+                sys.exit('Found Goal')'''
+        
+        
         return closest_vertex
 
 
@@ -236,14 +210,14 @@ class RRT:
 
         for _ in range(num_vertices):
             
-            x_rand = self.sample_state(grid)
+            x_rand = RRT.sample_state(self, grid)
             # sample states until a free state is found
             while grid[int(x_rand[0]), int(x_rand[1])] == 1:
-                x_rand = self.sample_state(grid)
+                x_rand = RRT.sample_state(self, grid)
                 
-            x_near = self.nearest_neighbor(x_rand, rrt)
-            u = self.select_input(x_rand, x_near)
-            x_new = self.new_state(x_near, u, dt)
+            x_near = RRT.nearest_neighbor(self, x_rand, rrt)
+            u = RRT.select_input(self, x_rand, x_near)
+            x_new = RRT.new_state(self, x_near, u, dt)
                 
             if grid[int(x_new[0]), int(x_new[1])] == 0:
                 # the orientation `u` will be added as metadata to
@@ -253,8 +227,7 @@ class RRT:
         print ("RRT Path Mapped")
         
     
-        return rrt 
-
+        return rrt              
 class States(Enum):
     MANUAL = auto()
     ARMING = auto()
@@ -263,7 +236,7 @@ class States(Enum):
     LANDING = auto()
     DISARMING = auto()
     PLANNING = auto()
-
+    
 class MotionPlanning(Drone):
 
     def __init__(self, connection):
@@ -383,7 +356,7 @@ class MotionPlanning(Drone):
         
         # Define a grid for a particular altitude and safety margin around obstacles
         
-        grid, north_offset, east_offset = RRT.create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
+        grid, north_offset, east_offset = RRT.create_grid(self, data, TARGET_ALTITUDE, SAFETY_DISTANCE)
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
         # Define starting point on the grid (this is just grid center)
         grid_start = (-north_offset, -east_offset)
@@ -416,22 +389,27 @@ class MotionPlanning(Drone):
         #path, _ = a_star(grid, heuristic, grid_start, grid_goal)
         '''
         
-        x_goal = (30, 750)
-        num_vertices = 1600
-        dt = 18
-        x_init = (20, 150)
-        path = [(20, 30), (40, 50)]
-        vertices = RRT.vertices
+       
         
-        rrt = RRT.generate_RRT(grid, x_init, num_vertices, dt)
+        rrt = RRT.generate_RRT(self, grid, RRT.x_init, RRT.num_vertices, RRT.dt)
         print ('v', rrt)
 
+        # Now let's plot the generated RRT.
+
+
+        plt.imshow(grid, cmap='Greys', origin='lower')
+        plt.plot(RRT.x_init[1], RRT.x_init[0], 'ro')
+        plt.plot(RRT.x_goal[1], RRT.x_goal[0], 'ro')
+
+        for (v1, v2) in rrt.edges:
+            plt.plot([v1[1], v2[1]], [v1[0], v2[0]], 'y-')
+
+        plt.show(block=True)
+
         
-        #print ('a_star', 'grid', grid, 'heuristic', heuristic, 'grid_start', grid_start, 'grid_goal', grid_goal)
-        #print ('a_star path', path, 'py_interpreter', _)
         
         # Convert path to waypoints
-        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in range(vertices)]
+        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in range(RRT.vertices)]
         
         print('wp', waypoints)
         

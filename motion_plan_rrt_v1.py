@@ -167,20 +167,13 @@ class MotionPlanning(Drone):
         
         # TODO: adapt to set goal as latitude / longitude position and convert
     
-        # ~ RRT - SZanlongo 
-        # ~ PRM
+        
         # environment encoded as a grid
-        # ~grid = create_grid()
+       
 
         # Let's take a look at the example environment we'll be using.
 
-        # ~plt.imshow(grid, cmap='Greys', origin='upper')
-        '''
-       
-       
-       
         '''   
-       
         # Run A* to find a path from start to goal 
        
         self.local_position_callback
@@ -196,14 +189,7 @@ class MotionPlanning(Drone):
         dt = 18
         x_init = (20, 150)
         
-        
-        
-        rrt = generate_RRT(grid, x_init, num_vertices, dt)
-        print ('v', rrt_v)
-
-        
-        #print ('a_star', 'grid', grid, 'heuristic', heuristic, 'grid_start', grid_start, 'grid_goal', grid_goal)
-        #print ('a_star path', path, 'py_interpreter', _)
+        rrt = RRT.generate_RRT(grid, x_init, num_vertices, dt)
         
         # Convert path to waypoints
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in rrt_vertices]
@@ -221,19 +207,15 @@ class MotionPlanning(Drone):
        
         # TODO (if you're feeling ambitious): Try a different approach altogether!
                
-    '''
-    '''
     def plan_rrt(self):
-        pass
-
-        def path_to_waypoints(self):   
+          
         self.plan_astar()
         # Convert path to waypoints
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
         # Set self.waypoints
         self.waypoints = waypoints
         # TODO: send waypoints to sim (this is just for visualization of waypoints)
-        self.send_waypoints()'''
+        self.send_waypoints()
 
       
 def start(self):
