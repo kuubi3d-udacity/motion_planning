@@ -154,13 +154,13 @@ class RRT:
         x_goal = (30, 750)
         
         wp_radius = np.linalg.norm(x_goal)
-        print ('waypoint radius', wp_radius)
+        #print ('waypoint radius', wp_radius)
     
         closest_dist = 100000
         closest_vertex = None
         x_rand = np.array(x_rand)
         x_goal = ( 30,750)
-        print ("Generating RRT")
+        
 
         for v in rrt.vertices:
             d = np.linalg.norm(x_rand - np.array(v[:2]))
@@ -205,7 +205,7 @@ class RRT:
 
     def generate_RRT(self, grid, x_init, num_vertices, dt,):
         
-        'print ("Generating RRT...")'
+        print ('Generating RRT...')
         rrt = RRT(x_init)
 
         for _ in range(num_vertices):
@@ -389,8 +389,6 @@ class MotionPlanning(Drone):
         #path, _ = a_star(grid, heuristic, grid_start, grid_goal)
         '''
         
-       
-        
         rrt = RRT.generate_RRT(self, grid, RRT.x_init, RRT.num_vertices, RRT.dt)
         print ('v', rrt)
 
@@ -427,8 +425,6 @@ class MotionPlanning(Drone):
        
         # TODO (if you're feeling ambitious): Try a different approach altogether!
             
-    
-    
       
 def start(self):
     self.start_log("Logs", "NavLog.txt")
