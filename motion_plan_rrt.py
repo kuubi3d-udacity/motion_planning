@@ -1,3 +1,5 @@
+import sys
+
 import argparse
 import time
 import msgpack
@@ -14,9 +16,10 @@ sys.path.insert(0, "/home/kuubi/ai/Udacity/FCND_Motion_Planning")'''
 
 from operator import itemgetter
 
-#from rrt import generate_RRT
-from planning_utils import a_star, heuristic
-from rrt import create_grid, generate_RRT
+#from rrt import create_grid as grid_gen
+#from planning_utils import a_star, heuristic
+#from rrt import create_grid, rrt_vertices
+#from rrt import create_grid
 
 #from planning_utils import create_grid
 # from planning_utils import a_star, heuristic, create_grid
@@ -27,6 +30,52 @@ from udacidrone.messaging import MsgID
 from udacidrone.frame_utils import global_to_local
 
 
+# coding: utf-8
+
+# # Rapidly-Exploring Random Tree (RRT)
+# 
+# Your task is to generate an RRT based on the following pseudocode:
+# 
+# ```
+# def generate_RRT(x_init, num_vertices, dt):
+#     rrt = RRT(x_init)
+#     for k in range(num_vertices):
+#         x_rand = sample_state()
+#         x_near = nearest_neighbor(x_rand, rrt)
+#         u = select_input(x_rand, x_near)
+#         x_new = new_state(x_near, u, dt)
+#         # directed edge
+#         rrt.add_edge(x_near, x_new, u)
+#     return rrt
+# ```
+#     
+# The `RRT` class has already been implemented. Your task is to complete the implementation of the following functions:
+# 
+# * `sample_state`
+# * `nearest_neighbor`
+# * `select_input`
+# * `new_state`
+# 
+
+import numpy as np 
+import matplotlib
+#matplotlib.use('Qt5Agg')
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KDTree
+import networkx as nx
+from IPython import get_ipython
+import time
+
+from enum import Enum
+from queue import PriorityQueue
+
+import sys
+
+get_ipython().run_line_magic('matplotlib', 'inline')
+plt.switch_backend('Qt5agg')
+
+plt.rcParams['figure.figsize'] = 12, 12
+
 class States(Enum):
     MANUAL = auto()
     ARMING = auto()
@@ -36,6 +85,182 @@ class States(Enum):
     DISARMING = auto()
     PLANNING = auto()
 
+class RRT:
+    def __init__(self, x_init):
+        # A tree is a special case of a graph with
+        # directed edges and only one path to any vertex.
+        self.tree = nx.DiGraph()
+        self.tree.add_node(x_init)
+                
+    def add_vertex(self, x_new):
+        self.tree.add_node(tuple(x_init))
+    
+    def add_edge(self, x_near, x_new, u):
+        self.tree.add_edge(tuple(x_near), tuple(x_new), orientation=u)
+        
+    @property
+    def vertices(self):
+        return self.tree.nodes()
+    
+    @property
+    def edges(self):
+        return self.tree.edges()
+
+    def create_grid(self, data, drone_altitude, safety_distance):
+        """
+        Returns a grid representation of a 2D configuration space
+        based on given obstacle data, drone altitude and safety distance
+        arguments.
+        """
+        
+        # minimum and maximum north coordinates
+        north_min = np.floor(np.min(data[:, 0] - data[:, 3]))
+        north_max = np.ceil(np.max(data[:, 0] + data[:, 3]))
+
+        # minimum and maximum east coordinates
+        east_min = np.floor(np.min(data[:, 1] - data[:, 4]))
+        east_max = np.ceil(np.max(data[:, 1] + data[:, 4]))
+
+        # given the minimum and maximum coordinates we can
+        # calculate the size of the grid.
+        north_size = int(np.ceil(north_max - north_min))
+        east_size = int(np.ceil(east_max - east_min))
+
+        # Initialize an empty grid
+        grid = np.zeros((north_size, east_size))
+
+        # Populate the grid with obstacles
+        for i in range(data.shape[0]):
+            north, east, alt, d_north, d_east, d_alt = data[i, :]
+            if alt + d_alt + safety_distance > drone_altitude:
+                obstacle = [
+                    int(np.clip(north - d_north - safety_distance - north_min, 0, north_size-1)),
+                    int(np.clip(north + d_north + safety_distance - north_min, 0, north_size-1)),
+                    int(np.clip(east - d_east - safety_distance - east_min, 0, east_size-1)),
+                    int(np.clip(east + d_east + safety_distance - east_min, 0, east_size-1)),
+                ]
+                grid[obstacle[0]:obstacle[1]+1, obstacle[2]:obstacle[3]+1] = 1
+        
+        # ~print('INFO', grid, drone_altitude, safety_distance)
+        # ~print(grid, int(north_min), int(east_min))        
+    
+
+        #print(grid, drone_altitude, safety_distance)
+        #print(grid, int(north_min), int(east_min))
+        return grid, int(north_min), int(east_min)
+    
+    def sample_state(self, grid):
+        x = np.random.uniform(0, grid.shape[0])
+        y = np.random.uniform(0, grid.shape[1])
+        return (x, y)
+
+
+    # ### Nearest Neighbors
+    # 
+    # A critical part of the RRT procedure is finding the closest vertex to the sampled random point. This the most computationally intensive part so be mindful of that. Depending on the number of vertices a naive implementation will run into trouble quickly.
+
+
+    def nearest_neighbor(self, x_rand, rrt):
+        
+        x_goal = (30, 750)
+        
+        wp_radius = np.linalg.norm(x_goal)
+        print ('waypoint radius', wp_radius)
+    
+        closest_dist = 100000
+        closest_vertex = None
+        x_rand = np.array(x_rand)
+        x_goal = ( 30,750)
+        print ("Generating RRT")
+
+        for v in rrt.vertices:
+            d = np.linalg.norm(x_rand - np.array(v[:2]))
+            if d < closest_dist:
+                closest_dist = d
+                closest_vertex = v
+                
+                beans = np.array(v[:2])
+                spinach = x_goal - np.array(v[:2])
+                
+                '''
+                print ("x_goal", x_goal)
+                print ("np.array",beans)
+                print ("matrix_norm", spinach)
+                print ("np.array", beans) 
+                print ("x_rand", x_rand)            
+                '''
+                
+                '''
+                print ("matrix_norm", spinach)
+                print ("np.array", beans) 
+                print ("x_rand", x_rand)
+                print ("np.array",)'''
+
+            
+                # ~arrive at goal  
+                # spinach = np.linalg.norm(v[:2] - x_goal)
+                # beans = np.array[np.linalg.norm(v[:2])]
+            #if np.linalg.norm(v[:2] - x_goal) < 1.0:
+            if np.linalg.norm(spinach) < 1.0:
+                print("Found Goal")    
+                break
+        'print (np.array(v[:2])'
+        print(bool(np.linalg.norm(spinach) < 1.0))
+        return closest_vertex
+
+
+    # ### Selecting Inputs
+    # 
+    # Select input which moves `x_near` closer to `x_rand`. This should return the angle or orientation of the vehicle.
+
+
+    def select_input(self, x_rand, x_near):
+        return np.arctan2(x_rand[1] - x_near[1], x_rand[0] - x_near[0])
+
+
+    # ### New State
+    # 
+    # 
+
+    # The new vertex `x_new` is calculated by travelling from the current vertex `x_near` with a orientation `u` for time `dt`.
+
+
+    def new_state(self, x_near, u, dt):
+        nx = x_near[0] + np.cos(u)*dt
+        ny = x_near[1] + np.sin(u)*dt
+        return [nx, ny]
+
+
+    # ### Putting It All Together
+    # 
+    # Awesome! Now we'll put everything together and generate an RRT.
+
+
+    def generate_RRT(self, grid, x_init, num_vertices, dt,):
+        
+        'print ("Generating RRT...")'
+        rrt = RRT(x_init)
+
+        for _ in range(num_vertices):
+            
+            x_rand = self.sample_state(grid)
+            # sample states until a free state is found
+            while grid[int(x_rand[0]), int(x_rand[1])] == 1:
+                x_rand = self.sample_state(grid)
+                
+            x_near = self.nearest_neighbor(x_rand, rrt)
+            u = self.select_input(x_rand, x_near)
+            x_new = self.new_state(x_near, u, dt)
+                
+            if grid[int(x_new[0]), int(x_new[1])] == 0:
+                # the orientation `u` will be added as metadata to
+                # the edge
+                rrt.add_edge(x_near, x_new, u)
+        
+        print ("RRT Path Mapped")
+        
+    
+        return rrt              
 
 class MotionPlanning(Drone):
 
@@ -46,7 +271,7 @@ class MotionPlanning(Drone):
         self.waypoints = []
         self.in_mission = True
         self.check_state = {}
-        #self.rrt_star_path = []
+        
 
         # initial state
         self.flight_state = States.MANUAL
@@ -57,11 +282,14 @@ class MotionPlanning(Drone):
         self.register_callback(MsgID.STATE, self.state_callback)
 
     def local_position_callback(self):
+        self.plan_rrt()
+        print ('local vel norm', np.linalg.norm(self.local_velocity[0:2]))
+
         if self.flight_state == States.TAKEOFF:
             if -1.0 * self.local_position[2] > 0.95 * self.target_position[2]:
                 self.waypoint_transition()
+        
         elif self.flight_state == States.WAYPOINT:
-            print (np.linalg.norm(self.local_velocity[0:2]))
             if np.linalg.norm(self.target_position[0:2] - self.local_position[0:2]) < 1.0:
                 if len(self.waypoints) > 0:
                     self.waypoint_transition()
@@ -81,6 +309,7 @@ class MotionPlanning(Drone):
                 self.arming_transition()
             elif self.flight_state == States.ARMING:
                 if self.armed:
+                    sys.exit('rrt is next')
                     self.plan_rrt()
             elif self.flight_state == States.PLANNING:
                 self.takeoff_transition()
@@ -127,15 +356,16 @@ class MotionPlanning(Drone):
         print("Sending waypoints to simulator ...")
         data = msgpack.dumps(self.waypoints)
         self.connection._master.write(data)
-
+      
     def plan_rrt(self):
         self.flight_state = States.PLANNING
-        print("Searching for a path ...")
+        print("Searching for a path ...")     
+        
         TARGET_ALTITUDE = 5
         SAFETY_DISTANCE = 5
 
         self.target_position[2] = TARGET_ALTITUDE
-
+        
         # TODO: read lat0, lon0 from colliders into floating point values
         
         # TODO: set home position to (lon0, lat0, 0)
@@ -150,7 +380,8 @@ class MotionPlanning(Drone):
         data = np.loadtxt('colliders.csv', delimiter=',', dtype='Float64', skiprows=2)
         
         # Define a grid for a particular altitude and safety margin around obstacles
-        grid, north_offset, east_offset = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
+        
+        grid, north_offset, east_offset = RRT.create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
         # Define starting point on the grid (this is just grid center)
         grid_start = (-north_offset, -east_offset)
@@ -169,26 +400,39 @@ class MotionPlanning(Drone):
         # Let's take a look at the example environment we'll be using.
 
         # ~plt.imshow(grid, cmap='Greys', origin='upper')
+        
+       
         # Run A* to find a path from start to goal 
        
-        self.local_position_callback
-
+        #self.local_position_callback
+        
+        
+        '''
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
         #path, _ = a_star(grid, heuristic, grid_start, grid_goal)
-
+        '''
+        
         x_goal = (30, 750)
         num_vertices = 1600
         dt = 18
         x_init = (20, 150)
+        path = [(20, 30), (40, 50)]
+        vertices = RRT.vertices
+        
+        rrt = RRT.generate_RRT(grid, x_init, num_vertices, dt)
+        print ('v', rrt)
 
-        #path, _ = generate_RRT(grid, x_init, num_vertices, dt)
-        print ('a_star', 'grid', grid, 'heuristic', heuristic, 'grid_start', grid_start, 'grid_goal', grid_goal)
-        print ('a_star path', path, 'py_interpreter', _)
+        
+        #print ('a_star', 'grid', grid, 'heuristic', heuristic, 'grid_start', grid_start, 'grid_goal', grid_goal)
+        #print ('a_star path', path, 'py_interpreter', _)
         
         # Convert path to waypoints
-        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
+        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in range(vertices)]
+        
+        print('wp', waypoints)
+        
         # Set self.waypoints
         self.waypoints = waypoints
         # TODO: send waypoints to sim (this is just for visualization of waypoints)
@@ -202,20 +446,9 @@ class MotionPlanning(Drone):
         # TODO: prune path to minimize number of waypoints
        
         # TODO (if you're feeling ambitious): Try a different approach altogether!
-         
-               
-    '''def plan_rrt(self):
-        pass
-
-        def path_to_waypoints(self):   
-        self.plan_astar()
-        # Convert path to waypoints
-        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
-        # Set self.waypoints
-        self.waypoints = waypoints
-        # TODO: send waypoints to sim (this is just for visualization of waypoints)
-        self.send_waypoints()'''
-
+            
+    
+    
       
 def start(self):
     self.start_log("Logs", "NavLog.txt")

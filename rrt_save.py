@@ -37,6 +37,8 @@ import time
 from enum import Enum
 from queue import PriorityQueue
 
+import sys
+
 get_ipython().run_line_magic('matplotlib', 'inline')
 plt.switch_backend('Qt5agg')
 
@@ -122,10 +124,10 @@ def create_grid(data, drone_altitude, safety_distance):
     #print(grid, int(north_min), int(east_min))
     return grid, int(north_min), int(east_min)
 
-
-
-    
+ 
 # environment encoded as a grid
+
+#def grid_data(self):
 
 TARGET_ALTITUDE = 5
 SAFETY_DISTANCE = 5
@@ -146,12 +148,22 @@ SAFETY_DISTANCE = 5
 data = np.loadtxt('colliders.csv', delimiter=',', dtype='Float64', skiprows=2)
 
 # Define a grid for a particular altitude and safety margin around obstacles
+sys.exit('preparing grid')
 grid, north_offset, east_offset = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
+print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
+# Define starting point on the grid (this is just grid center)
+grid_start = (-north_offset, -east_offset)
+# TODO: convert start position to current position rather than map center
+
+# Set goal as some arbitrary position on the grid
+grid_goal = (-north_offset + 10, -east_offset + 10)
+
+
 
 # Let's take a look at the example environment we'll be using.
 
-plt.imshow(grid, cmap='Greys', origin='upper')
-    
+#plt.imshow(grid, cmap='Greys', origin='upper')
+ 
 
 # Next you'll implement the functions necessary to generate an RRT. Feel free to change the function signatures however you please, just remember to update `generate_RRT` accordingly.
 
@@ -174,10 +186,9 @@ def sample_state(grid):
 def nearest_neighbor(x_rand, rrt):
     
     x_goal = (30, 750)
-    print (x_goal) 
     
     wp_radius = np.linalg.norm(x_goal)
-    print (wp_radius)
+    print ('waypoint radius', wp_radius)
  
     closest_dist = 100000
     closest_vertex = None
@@ -194,13 +205,13 @@ def nearest_neighbor(x_rand, rrt):
             beans = np.array(v[:2])
             spinach = x_goal - np.array(v[:2])
             
-
+            '''
             print ("x_goal", x_goal)
             print ("np.array",beans)
             print ("matrix_norm", spinach)
             print ("np.array", beans) 
             print ("x_rand", x_rand)            
-        
+            '''
             
             '''
             print ("matrix_norm", spinach)
@@ -252,7 +263,7 @@ def generate_RRT(grid, x_init, num_vertices, dt,):
     
     'print ("Generating RRT...")'
     rrt = RRT(x_init)
-    
+
     for _ in range(num_vertices):
         
         x_rand = sample_state(grid)
@@ -270,7 +281,9 @@ def generate_RRT(grid, x_init, num_vertices, dt,):
             rrt.add_edge(x_near, x_new, u)
     
     print ("RRT Path Mapped")
-    return rrt                
+    
+   
+    return rrt              
  
 '''
     # ~ arrive at goal    
@@ -345,6 +358,14 @@ x_init = (20, 150)
 
 rrt = generate_RRT(grid, x_init, num_vertices, dt)
 
+# ~Return vertices or edges
+
+def rrt_vertices (self):
+    rrt_v = rrt.vertices
+    return
+
+
+
 # Now let's plot the generated RRT.
 
 
@@ -356,4 +377,5 @@ for (v1, v2) in rrt.edges:
     plt.plot([v1[1], v2[1]], [v1[0], v2[0]], 'y-')
 
 plt.show(block=True)
+
 #plt.show()
