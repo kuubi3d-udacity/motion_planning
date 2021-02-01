@@ -8,8 +8,6 @@ from enum import Enum, auto
 import numpy as np
 import decimal
 
-'''import sys
-sys.path.insert(0, "/home/kuubi/ai/Udacity/FCND_Motion_Planning")'''
 
 # This file is subject to the terms and conditions defined in
 # file 'LICENSE', which is part of this source code package.

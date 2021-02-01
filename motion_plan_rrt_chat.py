@@ -13,7 +13,7 @@ import decimal
 # file 'LICENSE', which is part of this source code package.
 
 from operator import itemgetter
-
+from planning_utils import a_star, heuristic, create_grid
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -153,7 +153,7 @@ class RRT:
         
         x_goal = (30, 750)
         
-        wp_radius = np.linalg.norm(x_goal)
+        #wp_radius = np.linalg.norm(x_goal)
         #print ('waypoint radius', wp_radius)
     
         closest_dist = 100000
@@ -205,7 +205,7 @@ class RRT:
 
     def generate_RRT(self, grid, x_init, num_vertices, dt,):
         
-        print ('Generating RRT...')
+        print ('Generating RRT. It may take a few seconds...')
         rrt = RRT(x_init)
 
         for _ in range(num_vertices):
@@ -225,9 +225,9 @@ class RRT:
                 rrt.add_edge(x_near, x_new, u)
         
         print ("RRT Path Mapped")
-        
-    
-        return rrt              
+
+        return rrt 
+                    
 class States(Enum):
     MANUAL = auto()
     ARMING = auto()
@@ -255,9 +255,9 @@ class MotionPlanning(Drone):
         self.register_callback(MsgID.LOCAL_POSITION, self.local_position_callback)
         self.register_callback(MsgID.LOCAL_VELOCITY, self.velocity_callback)
         self.register_callback(MsgID.STATE, self.state_callback)
-
+    
     def local_position_callback(self):
-        self.plan_rrt()
+        print('altitude', self.target_position)
         print ('local vel norm', np.linalg.norm(self.local_velocity[0:2]))
 
         if self.flight_state == States.TAKEOFF:
@@ -284,7 +284,8 @@ class MotionPlanning(Drone):
                 self.arming_transition()
             elif self.flight_state == States.ARMING:
                 if self.armed:
-                    sys.exit('rrt is next')
+                    #sys.exit('rrt is next')
+                    print('rrt plan', self.flight_state)
                     self.plan_rrt()
             elif self.flight_state == States.PLANNING:
                 self.takeoff_transition()
@@ -379,7 +380,7 @@ class MotionPlanning(Drone):
        
         # Run A* to find a path from start to goal 
        
-        #self.local_position_callback
+        
         
         
         '''
@@ -394,25 +395,27 @@ class MotionPlanning(Drone):
 
         # Now let's plot the generated RRT.
 
-
+        #sys.exit('generating waypoints')
         plt.imshow(grid, cmap='Greys', origin='lower')
         plt.plot(RRT.x_init[1], RRT.x_init[0], 'ro')
         plt.plot(RRT.x_goal[1], RRT.x_goal[0], 'ro')
 
         for (v1, v2) in rrt.edges:
             plt.plot([v1[1], v2[1]], [v1[0], v2[0]], 'y-')
-
+        
         plt.show(block=True)
-
+        #self.local_position_callback
         
-        
+        #sys.exit('generating waypoints')
+        path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+        print (RRT.vertices)
         # Convert path to waypoints
-        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in range(RRT.vertices)]
-        
-        print('wp', waypoints)
+        self.waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
+        #sys.exit('generating waypoints')
+        print('wp', self.waypoints)
         
         # Set self.waypoints
-        self.waypoints = waypoints
+       #self.waypoints = waypoints
         # TODO: send waypoints to sim (this is just for visualization of waypoints)
         self.send_waypoints()
         

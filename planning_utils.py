@@ -3,7 +3,6 @@ from queue import PriorityQueue
 import numpy as np
 
 
-
 def create_grid(data, drone_altitude, safety_distance):
     """
     Returns a grid representation of a 2D configuration space
@@ -39,7 +38,6 @@ def create_grid(data, drone_altitude, safety_distance):
             ]
             grid[obstacle[0]:obstacle[1]+1, obstacle[2]:obstacle[3]+1] = 1
 
-    
     return grid, int(north_min), int(east_min)
 
 
@@ -90,8 +88,6 @@ def valid_actions(grid, current_node):
     return valid_actions
 
 
-
-
 def a_star(grid, h, start, goal):
 
     path = []
@@ -112,7 +108,7 @@ def a_star(grid, h, start, goal):
             current_cost = branch[current_node][0]
             
         if current_node == goal:        
-            print('Found a path.')
+            print('Found A* path.')
             found = True
             break
         else:
@@ -141,14 +137,10 @@ def a_star(grid, h, start, goal):
         print('**********************')
         print('Failed to find a path!')
         print('**********************') 
-    print('~path from a_star method', path[::-1])
     return path[::-1], path_cost
 
 
 
 def heuristic(position, goal_position):
-    
-    #print('position =', position, 'goal position = ', goal_position)
-    #print ('np.linag.norm = ',np.linalg.norm(np.array(position) - np.array(goal_position)))
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
