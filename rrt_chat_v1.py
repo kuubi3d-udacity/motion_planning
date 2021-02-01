@@ -151,8 +151,7 @@ class RRT:
 
     def nearest_neighbor(self, x_rand, rrt):
         
-        x_goal = (30, 750)
-        
+               
         #wp_radius = np.linalg.norm(x_goal)
         #print ('waypoint radius', wp_radius)
     
@@ -170,8 +169,8 @@ class RRT:
             '''
             if np.linalg.norm(x_goal - np.array(v[:2])) < 1.0:
                 print("Found Goal")    
-                sys.exit('Found Goal')'''
-        
+                sys.exit('Found Goal')
+            '''
         
         return closest_vertex
 
@@ -358,9 +357,12 @@ class MotionPlanning(Drone):
         
         # Set goal as some arbitrary position on the grid
         grid_goal = (-north_offset + 10, -east_offset + 10)
+       
         # TODO: adapt to set goal as latitude / longitude position and convert
 
         # Run A* to find a path from start to goal
+        
+        self.local_position_callback
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
@@ -371,7 +373,7 @@ class MotionPlanning(Drone):
         # TODO (if you're feeling ambitious): Try a different approach altogether!
         
         rrt = RRT.generate_RRT(self, grid, RRT.x_init, RRT.num_vertices, RRT.dt)
-        print ('v', rrt)
+      
 
         # Now let's plot the generated RRT.
 
@@ -384,11 +386,11 @@ class MotionPlanning(Drone):
             plt.plot([v1[1], v2[1]], [v1[0], v2[0]], 'y-')
         
         plt.show(block=True)
-        #self.local_position_callback
+        
         
         #sys.exit('generating waypoints')
         path, _ = a_star(grid, heuristic, grid_start, grid_goal)
-        print (RRT.vertices)
+        #print (RRT.vertices)
         # Convert path to waypoints
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
         # Set self.waypoints
@@ -415,7 +417,7 @@ if __name__ == "__main__":
     parser.add_argument('--host', type=str, default='127.0.0.1', help="host address, i.e. '127.0.0.1'")
     args = parser.parse_args()
 
-    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=120)
+    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=240)
     drone = MotionPlanning(conn)
     time.sleep(1)
 

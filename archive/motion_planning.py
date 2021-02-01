@@ -177,25 +177,10 @@ class MotionPlanning(Drone):
         # TODO: send waypoints to sim (this is just for visualization of waypoints)
         self.send_waypoints()
         
-        #return
-        #self.path_to_waypoints()
-
-        #rrt_motion_plan.rrt_star_path(self)
-        
+         
         # TODO: prune path to minimize number of waypoints
        
-    def plan_rrt(self):
-        pass
-
-        '''def path_to_waypoints(self):   
-        self.plan_astar()
-        # Convert path to waypoints
-        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
-        # Set self.waypoints
-        self.waypoints = waypoints
-        # TODO: send waypoints to sim (this is just for visualization of waypoints)
-        self.send_waypoints()'''
-
+    
       
 def start(self):
     self.start_log("Logs", "NavLog.txt")
